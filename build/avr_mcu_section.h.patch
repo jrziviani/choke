@@ -1,0 +1,15 @@
+--- avr_mcu_section.h	2018-08-19 23:21:55.863714157 -0300
++++ /tmp/avr_mcu_section.h	2018-08-19 23:21:35.342679815 -0300
+@@ -109,9 +109,9 @@
+ 
+ #define AVR_MCU_STRING(_tag, _str) \
+ 	const struct avr_mmcu_string_t _##_tag _MMCU_ = {\
+-		.tag = _tag,\
+-		.len = sizeof(struct avr_mmcu_string_t) - 2,\
+-		.string = _str,\
++		_tag,\
++		sizeof(struct avr_mmcu_string_t) - 2,\
++		_str,\
+ 	}
+ /*
+  * This trick allows concatenation of tokens. We need a macro redirection
