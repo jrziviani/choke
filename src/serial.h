@@ -10,7 +10,14 @@ namespace soc
 {
     class usart
     {
-    private:
+    public:
+        ~usart() = default;
+
+        usart(const usart&) = delete;
+        usart(usart&&) = delete;
+
+        usart &operator=(const usart&) = delete;
+        usart &operator=(usart&&) = delete;
 
     public:
         usart(uint16_t baud)
