@@ -6,7 +6,7 @@
 #include <iterator>
 #include <string>
 
-namespace soc
+namespace choke
 {
     class usart
     {

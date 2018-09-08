@@ -5,7 +5,7 @@
 
 #include <util/delay.h>
 
-namespace soc
+namespace choke
 {
     inline void delay_us(double usec)
     {

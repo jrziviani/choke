@@ -55,9 +55,9 @@ ISR(ADC_vect)
 
 int main()
 {
-    auto &board = soc::atmega328p::instance();
+    auto &board = choke::atmega328p::instance();
 
-    board.set_pin_mode(13, soc::MODE::OUTPUT);
+    board.set_pin_mode(13, choke::MODE::OUTPUT);
     board.write_digital(13, false);
 
     bool on = false;

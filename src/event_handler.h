@@ -8,7 +8,7 @@
 #define FCPU 16000000
 #endif
 
-namespace soc
+namespace choke
 {
     class event_t
     {

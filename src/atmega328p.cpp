@@ -11,7 +11,7 @@ void operator delete(void *ptr_, size_t size_)
         free(ptr_);
 }
 
-namespace soc
+namespace choke
 {
     enum ANALOGIC : uint8_t
     {

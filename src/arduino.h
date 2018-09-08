@@ -4,7 +4,7 @@
 #include "clib.h"
 #include "serial.h"
 
-namespace soc
+namespace choke
 {
     enum REFERENCE : uint8_t
     {

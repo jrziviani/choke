@@ -22,7 +22,7 @@
 //      (D 8) PB0 14|     |15  PB1 (D 9) PWM
 //                  +-----+
 
-namespace soc
+namespace choke
 {
     class atmega328p : public arduino
     {

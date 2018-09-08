@@ -1,6 +1,6 @@
 #include "event_handler.h"
 
-namespace soc
+namespace choke
 {
     void event_handler::set_timer(uint16_t timer_n, uint16_t compare, uint16_t arg)
     {

@@ -9,7 +9,7 @@ events_head_h = """#ifndef EVENTS_H
 #include "arduino.h"
 #include "atmega328p.h"
 
-namespace soc
+namespace choke
 {"""
 
 events_tail_h = """}
