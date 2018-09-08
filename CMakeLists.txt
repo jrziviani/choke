@@ -18,7 +18,7 @@ set (Choke_VERSION_MAJOR 0)
 set (Choke_VERSION_MINOR 1)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (CMAKE_BUILD_TYPE Debug)
+set (CMAKE_BUILD_TYPE RELEASE)
 
 #-------------
 # C++ compiler
@@ -43,17 +43,27 @@ add_definitions("-fpack-struct")
 add_definitions("-fshort-enums")
 add_definitions("-ffunction-sections")
 add_definitions("-fdata-sections")
+add_definitions("-fno-threadsafe-statics")
 
 set(CMAKE_EXE_LINKER_FLAGS
     "${CMAKE_EXE_LINKER_FLAGS} -mmcu=${AVRBOARD} -Wl,-gc-sections")
 
+find_package(PythonInterp REQUIRED)
+add_custom_command(OUTPUT "events.h"
+    PRELINK
+    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_BINARY_DIR}/build_events.py" "${CMAKE_SOURCE_DIR}/src/atmega328p.h" "${CMAKE_SOURCE_DIR}/src/events.h"
+    DEPENDS "${CMAKE_SOURCE_DIR}/src/main.cpp"
+)
+
 #-------------
 # Source files
 #-------------
-add_subdirectory (src)
 add_executable (choke
-                src/main.cpp)
+                src/main.cpp
+                src/atmega328p.cpp
+                src/event_handler.cpp)
 
 #add_custom_command(COMMAND get_events)
 add_custom_target(hex ALL ${AVROBJCPY} -j .text -j .data -O ihex choke choke.hex)
 add_custom_target(avrdude ${AVRDUDE} -c arduino -p ${AVRBOARD} -P ${AVRPORT} -b 115200 -v -U flash:w:choke.hex DEPENDS choke)
+add_custom_target(events ALL DEPENDS events.h)
