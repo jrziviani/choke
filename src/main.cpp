@@ -1,7 +1,9 @@
-#include "arduino_atmega328p.h"
+#include "events.h"
+#include "atmega328p.h"
 
 #include <util/delay.h>
 
+/*
 extern "C" {
 #include "avr_mcu_section.h"
 
@@ -44,10 +46,17 @@ const struct avr_mmcu_vcd_trace_t _mytrace[] _MMCU_ = {
     },
 };
 }
+*/
+
+ISR(ADC_vect)
+{
+    // user code here
+}
 
 int main()
 {
-    soc::arduino_atmega328p board;
+    auto &board = soc::atmega328p::instance();
+
     board.set_pin_mode(13, soc::MODE::OUTPUT);
     board.write_digital(13, false);
 
@@ -60,11 +69,13 @@ int main()
         board.write_digital(13, !on);
         on = !on;
 
+        /*
         if (on)
             board.serial().print("13: on\r\n");
         else
             board.serial().print("13: off\r\n");
-
+*/
+        /*
         r = board.read_analog(15);
         itoa(r, buf, 10);
         board.serial().print("analog: " + std::string(buf) + "\r\n");
@@ -74,7 +85,7 @@ int main()
         board.write_analog(14, 80);
         board.read_digital(14);
         tmp = board.read_analog(14);
-
+*/
         _delay_ms(500);
     }
 
