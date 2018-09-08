@@ -2,7 +2,7 @@
 #define CLIB_H
 
 #include <stdlib.h>
-#include <pnew.cpp>
+//#include <pnew.cpp>
 #include <avr/pgmspace.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
