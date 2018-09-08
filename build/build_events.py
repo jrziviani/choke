@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
 import sys
+import re
 
 events_head_h = """#ifndef EVENTS_H
 #define EVENTS_H
+
+#include "arduino.h"
+#include "atmega328p.h"
 
 namespace soc
 {"""
@@ -138,35 +142,45 @@ event_table = {
     "handle_wdt":              "WDT_vect"}
 
 def extract_event(line):
+    rline = re.search('void handle_[a-z0-9_]+\(.+\)', line)
+
+    if rline is None:
+        return None
+
     for event in event_table.keys():
-        if event in line:
+        if event == rline.group(0)[5:].split('(')[0]:
             return event
 
     return None
 
-def set_events(filename):
+def set_events(filename_in, filename_out):
     events_to_handle = []
 
-    with open(filename, mode='r') as file:
+    with open(filename_in, mode='r') as file:
         for line in file:
             event = extract_event(line)
             if event is None:
                 continue
             events_to_handle.append(event)
 
-    with open("events.h", mode='w') as file:
+    with open(filename_out, mode='w') as file:
         file.write(events_head_h);
 
         for event in events_to_handle:
             file.write("\n")
             file.write("    ISR(" + event_table[event] + ") {\n")
-            file.write("        board." + event + "();\n")
+            file.write("        event_t e;\n");
+            file.write("        atmega328p::instance()." + event + "(e);\n")
             file.write("    }\n")
 
         file.write(events_tail_h)
 
-def main(args):
-    set_events(args)
+def main(fin, fout):
+    set_events(fin, fout)
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    if len(sys.argv) != 3:
+        print("Usage: ./{0} <input.cpp> <output.h>".format(sys.argv[0]))
+        sys.exit(1)
+
+    main(sys.argv[1], sys.argv[2])
