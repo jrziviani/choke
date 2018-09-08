@@ -1,1 +1,8 @@
+src/events.h
 tags
+build/CMakeCache.txt
+build/Makefile
+build/*.hex
+build/*.cmake
+build/CMake*
+choke
