@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import re
 
-events_head_h = """#ifndef EVENTS_H
-#define EVENTS_H
+#events_head_h = """#ifndef EVENTS_H
+##define EVENTS_H
+#
+#"""
 
-#include "arduino.h"
-#include "atmega328p.h"
-
+events_ns = """
 namespace choke
 {"""
 
-events_tail_h = """}
-
-#endif // EVENTS_H"""
+events_tail_h = "}"
+#events_tail_h = """}
+#
+##endif // EVENTS_H"""
 
 event_table = {
     "handle_adc":              "ADC_vect",
@@ -153,34 +155,68 @@ def extract_event(line):
 
     return None
 
-def set_events(filename_in, filename_out):
-    events_to_handle = []
+def extract_class(line):
+    cline = re.search('\s*class\s+([a-zA-Z0-9_.]+)\s+:.*board', line)
 
-    with open(filename_in, mode='r') as file:
-        for line in file:
-            event = extract_event(line)
-            if event is None:
+    if cline is None:
+        return None
+
+    return cline.group(1)
+
+def set_events(fout, source_files):
+    events_to_handle = {}
+    used_srcs = []
+
+    current_class = "";
+    for source in source_files:
+        with open(source, mode='r') as file:
+            for line in file:
+                cclass = extract_class(line)
+                if (cclass is not None):
+                    current_class = cclass
+
+                event = extract_event(line)
+                if event is None:
+                    continue
+
+                if source not in used_srcs:
+                    fmt_src = source[source.rfind('/') + 1:]
+                    fout.write('#include "{0}"\n'.format(fmt_src))
+
+                events_to_handle[event] = current_class
+                used_srcs.append(source)
+
+    fout.write(events_ns);
+    for event, cl in events_to_handle.items():
+        fout.write("\n")
+        fout.write("    ISR(" + event_table[event] + ") {\n")
+        fout.write("        event_t e;\n");
+        fout.write("        " + cl + "::instance()." + event + "(e);\n")
+        fout.write("    }\n")
+
+def main(dir_in, filename_out):
+    source_files = []
+    with os.scandir(dir_in) as cdir:
+        for source in cdir:
+            if not source.is_file() or not source.name.endswith('.h'):
                 continue
-            events_to_handle.append(event)
 
-    with open(filename_out, mode='w') as file:
-        file.write(events_head_h);
+            source_files.append(source.path)
 
-        for event in events_to_handle:
-            file.write("\n")
-            file.write("    ISR(" + event_table[event] + ") {\n")
-            file.write("        event_t e;\n");
-            file.write("        atmega328p::instance()." + event + "(e);\n")
-            file.write("    }\n")
-
+    with open(filename_out, mode='w+') as file:
+        #file.write(events_head_h);
+        set_events(file, source_files)
         file.write(events_tail_h)
 
-def main(fin, fout):
-    set_events(fin, fout)
+def usage_die(progname):
+    print("Usage: ./{0} <dir> <output.cpp>".format(progname))
+    exit(1)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: ./{0} <input.cpp> <output.h>".format(sys.argv[0]))
-        sys.exit(1)
+        usage_die(sys.argv[0])
+
+    if (not os.path.isdir(sys.argv[1])):
+        usage_die(sys.argv[0])
 
     main(sys.argv[1], sys.argv[2])
