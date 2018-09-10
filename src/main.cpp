@@ -1,7 +1,5 @@
-#include "events.h"
-#include "atmega328p.h"
-
-#include <util/delay.h>
+#include "car.h"
+#include "driver.h"
 
 /*
 extern "C" {
@@ -48,45 +46,40 @@ const struct avr_mmcu_vcd_trace_t _mytrace[] _MMCU_ = {
 }
 */
 
-ISR(ADC_vect)
+enum pins : uint8_t
 {
-    // user code here
-}
+    MOTOR_B = 5,
+    MOTOR_B_FW,
+    MOTOR_B_BW,
+    MOTOR_A_BW,
+    MOTOR_A_FW,
+    MOTOR_A,
+
+    ECHO = 11,
+    TRIGGER,
+};
 
 int main()
 {
-    auto &board = choke::atmega328p::instance();
+    driver &pilot = driver::instance();
 
-    board.set_pin_mode(13, choke::MODE::OUTPUT);
-    board.write_digital(13, false);
+    engine left = {1, 0, pins::MOTOR_A_FW,
+                         pins::MOTOR_A_BW,
+                         pins::MOTOR_A};
+    engine right = {1, 0, pins::MOTOR_B_FW,
+                          pins::MOTOR_B_BW,
+                          pins::MOTOR_B};
 
-    bool on = false;
-    int r = 0;
-    char buf[32];
+    car ferrari(left, right, pilot.get_arduino());
+    pilot.set_car(&ferrari);
+
+#ifdef DEBUG_CAR
+    a = pilot.get_state();
+    b = pilot.get_obstacle();
+#endif
 
     while (true) {
-
-        board.write_digital(13, !on);
-        on = !on;
-
-        /*
-        if (on)
-            board.serial().print("13: on\r\n");
-        else
-            board.serial().print("13: off\r\n");
-*/
-        /*
-        r = board.read_analog(15);
-        itoa(r, buf, 10);
-        board.serial().print("analog: " + std::string(buf) + "\r\n");
-        board.serial().print(buf);
-
-        uint16_t tmp = board.read_analog(14);
-        board.write_analog(14, 80);
-        board.read_digital(14);
-        tmp = board.read_analog(14);
-*/
-        _delay_ms(500);
+        pilot.go();
     }
 
     return 0;

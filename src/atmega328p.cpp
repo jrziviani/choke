@@ -1,5 +1,7 @@
 #include "atmega328p.h"
 
+#define GET_PTR(field) pgm_read_ptr(&(arduino_pins[pin].field))
+
 void* operator new(size_t size_,void *ptr_)
 {
     return ptr_;
@@ -13,6 +15,29 @@ void operator delete(void *ptr_, size_t size_)
 
 namespace choke
 {
+    const avrpin arduino_pins[] PROGMEM = {
+        {_BV(0), &PIND, &PORTD, &DDRD, nullptr},
+        {_BV(1), &PIND, &PORTD, &DDRD, nullptr},
+        {_BV(2), &PIND, &PORTD, &DDRD, nullptr},
+        {_BV(3), &PIND, &PORTD, &DDRD, &OCR2B},
+        {_BV(4), &PIND, &PORTD, &DDRD, nullptr},
+        {_BV(5), &PIND, &PORTD, &DDRD, &OCR0B},
+        {_BV(6), &PIND, &PORTD, &DDRD, &OCR0A},
+        {_BV(7), &PIND, &PORTD, &DDRD, nullptr},
+        {_BV(0), &PINB, &PORTB, &DDRB, nullptr},
+        {_BV(1), &PINB, &PORTB, &DDRB, &OCR1A},
+        {_BV(2), &PINB, &PORTB, &DDRB, &OCR1B},
+        {_BV(3), &PINB, &PORTB, &DDRB, &OCR2A},
+        {_BV(4), &PINB, &PORTB, &DDRB, nullptr},
+        {_BV(5), &PINB, &PORTB, &DDRB, nullptr},
+        {_BV(0), &PINC, &PORTC, &DDRC, nullptr},
+        {_BV(1), &PINC, &PORTC, &DDRC, nullptr},
+        {_BV(2), &PINC, &PORTC, &DDRC, nullptr},
+        {_BV(3), &PINC, &PORTC, &DDRC, nullptr},
+        {_BV(4), &PINC, &PORTC, &DDRC, nullptr},
+        {_BV(5), &PINC, &PORTC, &DDRC, nullptr},
+    };
+
     enum ANALOGIC : uint8_t
     {
         A0 = 14, A1, A2, A3, A4, A5,
@@ -55,9 +80,6 @@ namespace choke
 
     atmega328p::atmega328p()
     {
-        events_.register_event<TIMER0_COMPA_vect_num>(
-                static_cast<handler_t>(&atmega328p::handle_timer0_compa),
-                0, 0, 10);
     }
 
     atmega328p::atmega328p(uint16_t baud)
@@ -153,10 +175,5 @@ namespace choke
         while (ADCSRA & (1 << ADSC));
 
         return ADC;
-    }
-
-    void atmega328p::handle_timer0_compa(const event_t&)
-    {
-        serial_.print(";-(\n");
     }
 }

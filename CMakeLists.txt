@@ -48,10 +48,10 @@ add_definitions("-fno-threadsafe-statics")
 set(CMAKE_EXE_LINKER_FLAGS
     "${CMAKE_EXE_LINKER_FLAGS} -mmcu=${AVRBOARD} -Wl,-gc-sections")
 
-find_package(PythonInterp REQUIRED)
-add_custom_command(OUTPUT "events.h"
+find_package(PythonInterp 3 REQUIRED)
+add_custom_command(OUTPUT "${CMAKE_SOURCE_DIR}/src/events.cpp"
     PRELINK
-    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_BINARY_DIR}/build_events.py" "${CMAKE_SOURCE_DIR}/src/atmega328p.h" "${CMAKE_SOURCE_DIR}/src/events.h"
+    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/build_events.py" "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/events.cpp"
     DEPENDS "${CMAKE_SOURCE_DIR}/src/main.cpp"
 )
 
@@ -60,10 +60,13 @@ add_custom_command(OUTPUT "events.h"
 #-------------
 add_executable (choke
                 src/main.cpp
+                src/events.cpp
+                src/car.cpp
+                src/driver.cpp
                 src/atmega328p.cpp
                 src/event_handler.cpp)
 
 #add_custom_command(COMMAND get_events)
 add_custom_target(hex ALL ${AVROBJCPY} -j .text -j .data -O ihex choke choke.hex)
 add_custom_target(avrdude ${AVRDUDE} -c arduino -p ${AVRBOARD} -P ${AVRPORT} -b 115200 -v -U flash:w:choke.hex DEPENDS choke)
-add_custom_target(events ALL DEPENDS events.h)
+add_custom_target(events ALL DEPENDS ${CMAKE_SOURCE_DIR}/src/events.cpp)

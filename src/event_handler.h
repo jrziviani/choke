@@ -2,10 +2,9 @@
 #define EVENT_HANDLER_H
 
 #include "clib.h"
-#include "arduino.h"
 
 #ifndef FCPU
-#define FCPU 16000000
+    #define FCPU 16000000
 #endif
 
 namespace choke
@@ -51,7 +50,6 @@ namespace choke
             static_assert(event == 999999);
     }
 
-    using handler_t = void (arduino::*)(const event_t&);
     class event_handler
     {
     public:
@@ -64,8 +62,10 @@ namespace choke
         event_handler &operator=(event_handler&&) = delete;
 
     public:
-        template <uint16_t event>
-        void register_event(handler_t handler,
+        // std::function is not available, so a pre-C++11 solution is
+        // necessary
+        template <uint16_t event, class C>
+        void register_event(void (C::*fn)(const event_t&),
                             uint16_t timer_n,
                             uint16_t compare,
                             uint16_t arg)

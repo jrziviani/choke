@@ -1,9 +1,7 @@
 #ifndef ATMEGA328_H
 #define ATMEGA328_H
 
-#include "event_handler.h"
-
-#define GET_PTR(field) pgm_read_ptr(&(arduino_pins[pin].field))
+#include "arduino.h"
 
 //                  +-----+
 //            PC6  1|o    |28  PC5 (AI 5)
@@ -26,14 +24,10 @@ namespace choke
 {
     class atmega328p : public arduino
     {
-        private:
-            event_handler events_;
-
-        protected:
+        public:
             atmega328p();
             atmega328p(uint16_t baud);
 
-        public:
             void set_pin_mode(uint8_t pin, MODE mode);
             MODE get_pin_mode(uint8_t pin);
 
@@ -42,15 +36,6 @@ namespace choke
 
             void write_analog(uint8_t pin, uint16_t data);
             uint16_t read_analog(uint8_t pin);
-
-            void handle_timer0_compa(const event_t&);
-
-        public:
-            static atmega328p &instance()
-            {
-                static atmega328p inst;
-                return inst;
-            }
     };
 }
 

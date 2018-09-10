@@ -29,29 +29,6 @@ namespace choke
         OUTPUT,
     };
 
-    const avrpin arduino_pins[] PROGMEM = {
-        {_BV(0), &PIND, &PORTD, &DDRD, nullptr},
-        {_BV(1), &PIND, &PORTD, &DDRD, nullptr},
-        {_BV(2), &PIND, &PORTD, &DDRD, nullptr},
-        {_BV(3), &PIND, &PORTD, &DDRD, &OCR2B},
-        {_BV(4), &PIND, &PORTD, &DDRD, nullptr},
-        {_BV(5), &PIND, &PORTD, &DDRD, &OCR0B},
-        {_BV(6), &PIND, &PORTD, &DDRD, &OCR0A},
-        {_BV(7), &PIND, &PORTD, &DDRD, nullptr},
-        {_BV(0), &PINB, &PORTB, &DDRB, nullptr},
-        {_BV(1), &PINB, &PORTB, &DDRB, &OCR1A},
-        {_BV(2), &PINB, &PORTB, &DDRB, &OCR1B},
-        {_BV(3), &PINB, &PORTB, &DDRB, &OCR2A},
-        {_BV(4), &PINB, &PORTB, &DDRB, nullptr},
-        {_BV(5), &PINB, &PORTB, &DDRB, nullptr},
-        {_BV(0), &PINC, &PORTC, &DDRC, nullptr},
-        {_BV(1), &PINC, &PORTC, &DDRC, nullptr},
-        {_BV(2), &PINC, &PORTC, &DDRC, nullptr},
-        {_BV(3), &PINC, &PORTC, &DDRC, nullptr},
-        {_BV(4), &PINC, &PORTC, &DDRC, nullptr},
-        {_BV(5), &PINC, &PORTC, &DDRC, nullptr},
-    };
-
     class arduino
     {
     protected:
